@@ -29,7 +29,7 @@ public class NodeDetection {
 
 		Metamap mm = new Metamap();
 		MetaMapApi api = new MetaMapApiImpl();
-		api.setOptions("-y -z -D -k <aapp,acty,aggp,amas,amph,anim,anst,antb,arch,bacs,bact,bdsu,bdsy,bhvr,bird,blor,bmod,bodm,bsoj,carb,celc,celf,cell,chem,chvf,chvs,clas,clnd,cnce,crbs,diap,dora,drdd,edac,eehu,eico,elii,emst,enty,enzy,euka,evnt,famg,ffas,fish,fngs,food,ftcn,genf,geoa,gngm,gora,grpa,grup,hcpp,hcro,hlca,horm,humn,idcn,imft,inbe,inch,inpr,irda,lang,lbpr,lipd,mamm,mbrt,mcha,medd,mnob,moft,mosq,nnon,npop,nsba,nusq,ocac,ocdi,opco,orch,orga,orgf,orgm,orgt,ortf,phob,phpr,phsu,plnt,podg,popg,prog,pros,qlco,qnco,rcpt,rept,resa,resd,rnlw,sbst,shro,socb,spco,strd,tmco,topp,virs,vita,vtbt>");
+		api.setOptions("-y -k <aapp,acty,aggp,amas,amph,anim,anst,antb,arch,bacs,bact,bdsu,bdsy,bhvr,bird,blor,bmod,bodm,bsoj,carb,celc,celf,cell,chem,chvf,chvs,clas,clnd,cnce,crbs,diap,dora,drdd,edac,eehu,eico,elii,emst,enty,enzy,euka,evnt,famg,ffas,fish,fngs,food,ftcn,genf,geoa,gngm,gora,grpa,grup,hcpp,hcro,hlca,horm,humn,idcn,imft,inbe,inch,inpr,irda,lang,lbpr,lipd,mamm,mbrt,mcha,medd,mnob,moft,mosq,nnon,npop,nsba,nusq,ocac,ocdi,opco,orch,orga,orgf,orgm,orgt,ortf,phob,phpr,phsu,plnt,podg,popg,prog,pros,qlco,qnco,rcpt,rept,resa,resd,rnlw,sbst,shro,socb,spco,strd,tmco,topp,virs,vita,vtbt>");
 		
 		/*
 		 * 
@@ -155,10 +155,17 @@ public class NodeDetection {
 				 * Put in the code
 				 * 
 				 */
+//				Ptemp_chunk_result.clear();
+//				Pchunk_result.clear();
+//				Ptemp_chunk_result = Pchunk(P_dictionaryChunkerTF, val.toLowerCase(), "BROMFED-DM", "9");
+//				Pchunk_result = filtering(Ptemp_chunk_result);
+//				for (String p : Pchunk_result) {
+//					out.write("Phenotype:" + p);
+//					out.newLine();
+//				}
 				
 				Ptemp_chunk_result.clear();
 				Pchunk_result.clear();
-//				Ptemp_chunk_result = Pchunk(P_dictionaryChunkerTF, val.toLowerCase(), "BROMFED-DM", "9");
 				String tmp_string = mm.preprocessing(val);
 				Ptemp_chunk_result = mm.metamap(api, tmp_string);
 				Pchunk_result = filtering(Ptemp_chunk_result);

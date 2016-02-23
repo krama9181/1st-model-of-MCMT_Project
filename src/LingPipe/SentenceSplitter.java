@@ -37,7 +37,7 @@ public class SentenceSplitter {
 	static String whatKindTarget = "";	//function, MOA or Toxicity
 	
 
-	public LinkedHashMap<String, LinkedHashSet<String>> Splitter(File FunctionTextFile) throws IOException {
+	public static LinkedHashMap<String, LinkedHashSet<String>> Splitter(File FunctionTextFile) throws IOException {
 
 		taggingTargetcontents();
 		
@@ -50,14 +50,14 @@ public class SentenceSplitter {
 			String[] textLine_split = textLine.split("\t");
 			String EntityOneRef_ID = textLine_split[whereIsEntityOneID];
 			String EntityOneName = textLine_split[whereIsEntityOneName];
-			String targetContents = textLine_split[whereIsTarget].toLowerCase().trim();
-
+			String targetContents = textLine_split[whereIsTarget].trim();
 			
 			if (targetContents.equals("null")) {
 			} else {
 				split_allTypeText(EntityOneRef_ID, EntityOneName, TypeofTarget , targetContents, whatKindTarget);
 			}
 		}
+		
 		return sentences_map;
 	}
 
@@ -104,14 +104,17 @@ public class SentenceSplitter {
 
 		int sentStartTok = 0;
 		int sentEndTok = 0;
+		
 		for (int i = 0; i < sentenceBoundaries.length; ++i) {
-			String temp = "";
+		    String temp = "";
 			sentEndTok = sentenceBoundaries[i];
-			for (int j = sentStartTok; j <= sentEndTok; j++) {
-				temp += tokens[j] + whites[j + 1];
-			}
-			sentStartTok = sentEndTok + 1;
-
+		 //   System.out.println("SENTENCE "+(i+1)+": ");
+		    for (int j=sentStartTok; j <= sentEndTok; j++) {
+		    	temp += tokens[j]+whites[j+1];
+		    }
+		 //   System.out.println(temp);
+		    sentStartTok = sentEndTok+1;
+			
 			if (temp.contains("/")) {
 				String[] temp_split = temp.split(" / ");
 				for (String t : temp_split) {
@@ -123,7 +126,6 @@ public class SentenceSplitter {
 						splitsentence.add(t.toLowerCase().trim());
 					}
 				}
-
 			} else {
 				// remove phrase whose length is less than 3.
 				if (temp.length() < 3) {
@@ -132,16 +134,6 @@ public class SentenceSplitter {
 				splitsentence.add(temp.toLowerCase().trim());
 			}
 		}
-
-		if (sentences_map.containsKey(	KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + allType_text)) {
-			sentences_map.put(
-					KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + allType_text,
-					splitsentence);
-		} else {
-			sentences_map.put(
-					KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + allType_text,
-					splitsentence);
-		}
+		sentences_map.put(	KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + allType_text,	splitsentence);
 	}
-
 }

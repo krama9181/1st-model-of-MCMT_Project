@@ -35,11 +35,12 @@ public class Metamap {
 		LinkedHashSet<String> result = new LinkedHashSet<String>();	
 //		System.out.println("api instanciated");
 		List<Result> resultList = api.processCitationsFromString(input);
+
 		Result NER_result = resultList.get(0);
 		
 		for (Utterance utterance : NER_result.getUtteranceList()) {
 			//System.out.println("Utterance:");
-			//System.out.println(" Utterance text: " + utterance.getString());
+		//	System.out.println(" Utterance text: " + utterance.getString());
 			for (PCM pcm : utterance.getPCMList()) {
 				for (Mapping map : pcm.getMappingList()) {					
 					for (Ev mapEv : map.getEvList()) {						

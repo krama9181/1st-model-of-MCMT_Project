@@ -34,7 +34,8 @@ public class ExtractRelation {
 	static String EntityOneReference = "";
 	static String dataType = "";
 	static String KindofText = "";
-
+	static String originalSentence = "";
+		
 	public ExtractRelation() {
 		sentence = "";
 		EntityOneID = "";
@@ -42,6 +43,7 @@ public class ExtractRelation {
 		EntityOneReference = "";
 		dataType = "";
 		KindofText = "";
+		originalSentence = "";
 	}
 
 	static String modelPath = DependencyParser.DEFAULT_MODEL;
@@ -74,7 +76,10 @@ public class ExtractRelation {
 		out.write("Entity1 ID" + "\t" + "Entity1 Name" + "\t" + "reference" + "\t" + "Entity1_start" + "\t"
 				+ "Entity2_end" + "\t" + "Relation type" + "\t" + "trigger" + "\t" + "trigger_start" + "\t"
 				+ "trigger_end" + "\t" + "phenotype_name" + "\t" + "UMLS_ID" + "\t" + "UMLS_Symantic_type" + "\t"
-				+ "pheonotype_start" + "\t" + "phenotype_end" + "\t" + "sentence");
+				+ "pheonotype_start" + "\t" + "phenotype_end" + "\t" + "sentence" +"\t" + "original_Entity1_start" + "\t" 
+				+ "original_Entity1_end"+ "\t" + "original_trigger_start" + "\t" + "original_trigger_end"  + "\t" 
+				+ "original_pheonotype_start" + "\t" + "original_pheonotype_end" + "\t" + "original_sentence");
+		
 		out.newLine();
 
 		for (File file : Function_listOfFiles) {
@@ -87,7 +92,15 @@ public class ExtractRelation {
 				LinkedHashSet<String> annotatedTrigger = new LinkedHashSet<String>();
 				LinkedHashSet<String> annotatedEntityOne = new LinkedHashSet<String>();
 				String checkLine = "ID_";
-
+				int originalOffsetBase = 0;
+				
+//				int originalEntityOne_start = 0;
+//				int originalEntityOne_end = 0;
+//				int originalTrigger_start = 0;
+//				int originalTrigger_end = 0;
+//				int originalPheno_start = 0;
+//				int originalPheno_end = 0;
+								
 				while ((line = br.readLine()) != null) {
 					if (checkLine.equals(line.substring(0, 3))) {
 						String temp = line.substring(0 + "ID_OriginalText_Reference:".length(), line.length());
@@ -98,9 +111,11 @@ public class ExtractRelation {
 						EntityOneID = temp_split[2];
 						EntityOneName = temp_split[3];
 						EntityOneReference = temp_split[4];
-
+						originalSentence = temp_split[5];
 						continue;
 					}
+					
+					
 
 					String relationDefault = "";
 
@@ -133,17 +148,25 @@ public class ExtractRelation {
 						annotatedEntityOne.add(entityOne);
 					}
 					if (line.equals("@@@")) {
-						if (annotatedEntityOne.size() >= 0 && annotatedTrigger.size() >= 0
-								&& annotatedPhenotype.size() > 0) {
+						if (annotatedEntityOne.size() >= 0 && annotatedTrigger.size() >= 0	&& annotatedPhenotype.size() > 0) {
 
 							////// no relation /////
 							if (annotatedTrigger.size() == 0) {
 								if (annotatedEntityOne.size() == 0) {
 									for (String p : annotatedPhenotype) {
 										String[] pheno = p.split("\t");
+										
+										int originalEntityOne_start = 0;
+										int originalEntityOne_end = 0;
+										int originalTrigger_start = 0;
+										int originalTrigger_end = 0;
+										int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
+										int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
+										
 										Result.add("NA" + "\t" + "NA" + "\t" + relationDefault + "\t" + "NA" + "\t"
 												+ "NA" + "\t" + "NA" + "\t" + pheno[0] + "\t" + pheno[3] + "\t"
-												+ pheno[4] + "\t" + pheno[1] + "\t" + pheno[2] + "\t" + sentence);
+												+ pheno[4] + "\t" + pheno[1] + "\t" + pheno[2] + "\t" + sentence  + "\t"  + "NA" + "\t"  + "NA" + "\t" + 
+												"NA" + "\t" + "NA"+ "\t"  + originalPheno_start + "\t" +( pheno[2]+originalOffsetBase));
 									}
 								} else {
 									for (String e : annotatedEntityOne) {
@@ -158,10 +181,20 @@ public class ExtractRelation {
 											int p_begin_minus_e_begin = p_begin - e_begin;
 
 											if (p_begin_minus_e_begin > 0) {
+												
+												int originalEntityOne_start = Integer.parseInt(entiOne[1])+originalOffsetBase;
+												int originalEntityOne_end = Integer.parseInt(entiOne[2])+originalOffsetBase;
+												int originalTrigger_start = 0;
+												int originalTrigger_end = 0;
+												int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
+												int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
+												
 												Result.add(entiOne[1] + "\t" + entiOne[2] + "\t" + relationDefault
 														+ "\t" + "NA" + "\t" + "NA" + "\t" + "NA" + "\t" + pheno[0]
 														+ "\t" + pheno[3] + "\t" + pheno[4] + "\t" + pheno[1] + "\t"
-														+ pheno[2] + "\t" + sentence);
+														+ pheno[2] + "\t" + sentence + "\t" + originalEntityOne_start + "\t" 
+														+ originalEntityOne_end + "\t" + "NA" + "\t" + "NA" + "\t" + 
+														originalPheno_start + "\t" +originalPheno_end);
 											}
 										}
 
@@ -188,10 +221,20 @@ public class ExtractRelation {
 												dep_distance = cal_distance(sentence, pheno[0], trig[0]);
 												int result = Math.abs(dep_distance[0] - dep_distance[1]);
 												if (result < 5) {
+													
+													int originalEntityOne_start = 0;
+													int originalEntityOne_end = 0;
+													int originalTrigger_start = Integer.parseInt(trig[1])+originalOffsetBase;
+													int originalTrigger_end = Integer.parseInt(trig[2])+originalOffsetBase;
+													int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
+													int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
+													
 													Result.add("NA" + "\t" + "NA" + "\t" + trig[3] + "\t" + trig[0]
 															+ "\t" + trig[1] + "\t" + trig[2] + "\t" + pheno[0] + "\t"
 															+ pheno[3] + "\t" + pheno[4] + "\t" + pheno[1] + "\t"
-															+ pheno[2] + "\t" + sentence);
+															+ pheno[2] + "\t" + sentence  + "\t" + "NA" + "\t" 
+															+ "NA" + "\t" +originalTrigger_start + "\t" + originalTrigger_end + "\t" + 
+															originalPheno_start + "\t" + originalPheno_end);
 												}
 											}
 										}
@@ -222,11 +265,21 @@ public class ExtractRelation {
 														dep_distance = cal_distance(sentence, pheno[0], trig[0]);
 														int result = Math.abs(dep_distance[0] - dep_distance[1]);
 														if (result < 5) {
+															
+															int originalEntityOne_start = Integer.parseInt(entiOne[1])+originalOffsetBase;
+															int originalEntityOne_end = Integer.parseInt(entiOne[2])+originalOffsetBase;
+															int originalTrigger_start = Integer.parseInt(trig[1])+originalOffsetBase;
+															int originalTrigger_end = Integer.parseInt(trig[2])+originalOffsetBase;
+															int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
+															int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
+															
 															Result.add(entiOne[1] + "\t" + entiOne[2] + "\t" + trig[3]
 																	+ "\t" + trig[0] + "\t" + trig[1] + "\t" + trig[2]
 																	+ "\t" + pheno[0] + "\t" + pheno[3] + "\t"
 																	+ pheno[4] + "\t" + pheno[1] + "\t" + pheno[2]
-																	+ "\t" + sentence);
+																	+ "\t" + sentence + "\t" +originalEntityOne_start + "\t" 
+																	+ originalEntityOne_end + "\t" + originalTrigger_start + "\t" + originalTrigger_end + "\t" + 
+																	originalPheno_start + "\t" + originalPheno_end);
 														}
 													}
 												}
@@ -271,11 +324,21 @@ public class ExtractRelation {
 												int result = Math.abs(dep_distance[0] - dep_distance[1]);
 
 												if (result < 5) {
+													
+													int originalEntityOne_start = 0;
+													int originalEntityOne_end = 0;
+													int originalTrigger_start = Integer.parseInt(value_split[1])+originalOffsetBase;
+													int originalTrigger_end = Integer.parseInt(value_split[2])+originalOffsetBase;
+													int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
+													int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
+													
 													Result.add("NA" + "\t" + "NA" + "\t" + value_split[3] + "\t"
 															+ value_split[0] + "\t" + value_split[1] + "\t"
 															+ value_split[2] + "\t" + pheno[0] + "\t" + pheno[3] + "\t"
 															+ pheno[4] + "\t" + pheno[1] + "\t" + pheno[2] + "\t"
-															+ sentence);
+															+ sentence + "\t" +"NA" + "\t" 
+															+ "NA" + "\t" + originalTrigger_start + "\t" +originalTrigger_end + "\t" + 
+															originalPheno_start + "\t" + originalPheno_end);
 												}
 											}
 										}
@@ -322,11 +385,21 @@ public class ExtractRelation {
 													int result = Math.abs(dep_distance[0] - dep_distance[1]);
 
 													if (result < 5) {
+														
+														int originalEntityOne_start = Integer.parseInt(entiOne[1])+originalOffsetBase;
+														int originalEntityOne_end = Integer.parseInt(entiOne[2])+originalOffsetBase;
+														int originalTrigger_start = Integer.parseInt(value_split[1])+originalOffsetBase;
+														int originalTrigger_end = Integer.parseInt(value_split[2])+originalOffsetBase;
+														int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
+														int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
+														
 														Result.add(entiOne[1] + "\t" + entiOne[2] + "\t"
 																+ value_split[3] + "\t" + value_split[0] + "\t"
 																+ value_split[1] + "\t" + value_split[2] + "\t"
 																+ pheno[0] + "\t" + pheno[3] + "\t" + pheno[4] + "\t"
-																+ pheno[1] + "\t" + pheno[2] + "\t" + sentence);
+																+ pheno[1] + "\t" + pheno[2] + "\t" + sentence + "\t" + originalEntityOne_start + "\t" 
+																+ originalEntityOne_end + "\t" + originalTrigger_start + "\t" + originalTrigger_end + "\t" + 
+																originalPheno_start + "\t" + originalPheno_end);
 													}
 												}
 											}
@@ -337,7 +410,7 @@ public class ExtractRelation {
 						}
 						for (String o : Result) {
 							out.write(EntityOneID.toUpperCase() + "\t" + EntityOneName + "\t" + EntityOneReference
-									+ "\t" + o);
+									+ "\t" + o + "\t" + originalSentence);
 							out.newLine();
 						}
 
@@ -345,6 +418,8 @@ public class ExtractRelation {
 						annotatedPhenotype.clear();
 						annotatedTrigger.clear();
 						annotatedEntityOne.clear();
+						
+						originalOffsetBase += sentence.length()+1;
 					}
 				}
 			}
