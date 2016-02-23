@@ -28,7 +28,7 @@ public class Main_REModule {
 	static String RelationResultOutputPath = path + "Output/changed_offset_output_6.tsv"; // Final output path
 	
 	public static void main(String[] args) throws Exception {
-		
+		////////
 		createFolder();			
 		SentenceSplitter splitter = new SentenceSplitter();
 		NodeDetection node_detector = new NodeDetection();
