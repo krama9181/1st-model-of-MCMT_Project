@@ -105,56 +105,87 @@ public class SentenceSplitter {
 		int sentStartTok = 0;
 		int sentEndTok = 0;
 		
-		for (int i = 0; i < sentenceBoundaries.length; ++i) {
-		    String temp = "";
-			sentEndTok = sentenceBoundaries[i];
-		    for (int j=sentStartTok; j <= sentEndTok; j++) {
-		    	temp += tokens[j]+whites[j+1];
-		    }
-		    sentStartTok = sentEndTok+1;
-			
-		    
-			if (TypeofTarget.equals("phra")) {
-				if (temp.contains("/")) {
-					String[] temp_split = temp.split(" / ");
-					for (String t : temp_split) {
-						if (!t.trim().toLowerCase().equals("null")) {
-							// remove phrase whose length is less than 3.
-							if (t.length() < 3) {
-								continue;
-							}
+		
+		
+		if(TypeofTarget.equals("sent")){
+			for (int i = 0; i < sentenceBoundaries.length; ++i) {
+			    String temp = "";
+				sentEndTok = sentenceBoundaries[i];
+			    for (int j=sentStartTok; j <= sentEndTok; j++) {
+			    	temp += tokens[j]+whites[j+1];
+			    }
+			    sentStartTok = sentEndTok+1;
 
-							String[] comma_split = t.split(",");
-							int comma_count = comma_split.length;
-
-							String subInput = "";
-
-							for (int j = 0; j < comma_count; j++) {
-								splitsentence.add(comma_split[j].toLowerCase().trim());
-							}
-						}
-					}
-
-				} else {
-					// remove phrase whose length is less than 3.
-					if (temp.length() < 3) {
-						continue;
-					}
-					String[] comma_split = temp.split(",");
-					int comma_count = comma_split.length;
-
-					if (comma_count > 5) {
-						for (int j = 0; j < comma_count; j++) {
-
-							splitsentence.add(comma_split[j].toLowerCase().trim());
+			splitsentence.add(temp.toLowerCase().trim());
+			}
+		}
+		
+		else if(TypeofTarget.equals("phra")){
+			if (allType_text.contains("/")) {
+				String[] temp_split = allType_text.split(" / ");
+				for (String t : temp_split) {
+					if (!t.trim().toLowerCase().equals("null")) {
+						String[] comma_split = t.split(",");
+						
+						for(String  c : comma_split){
+							splitsentence.add(c.trim().toLowerCase());
 						}
 					}
 				}
 			} else {
-				splitsentence.add(temp.toLowerCase().trim());
+				// remove phrase whose length is less than 3.
+				String[] comma_split = allType_text.split(",");
+				for(String  c : comma_split){
+					splitsentence.add(c.trim().toLowerCase());
+				}			
 			}
+		
+		}
+		
+		else
+		    System.out.println("You entered odd value of type of sentence");
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//			if (TypeofTarget.equals("phra")) {
+//				if (temp.contains("/")) {
+//					String[] temp_split = temp.split(" / ");
+//					for (String t : temp_split) {
+//						if (!t.trim().toLowerCase().equals("null")) {
+//							// remove phrase whose length is less than 3.
+//							if (t.length() < 3) {
+//								continue;
+//							}
+//
+//							String[] comma_split = t.split(",");
+//							int comma_count = comma_split.length;
+//
+//							String subInput = "";
+//
+//							for (int j = 0; j < comma_count; j++) {
+//								splitsentence.add(comma_split[j].toLowerCase().trim());
+//							}
+//						}
+//					}
+//
+//				} else {
+//					// remove phrase whose length is less than 3.
+//					if (temp.length() < 3) {
+//						continue;
+//					}
+//					String[] comma_split = temp.split(",");
+//					int comma_count = comma_split.length;
+//
+//					if (comma_count > 5) {
+//						for (int j = 0; j < comma_count; j++) {
+//
+//							splitsentence.add(comma_split[j].toLowerCase().trim());
+//						}
+//					}
+//				}
+//			} else {
+//				splitsentence.add(temp.toLowerCase().trim());
+//			}
 		    
-		    
+		
 ///////////////////////////////////////////////////////////////////////////////////		    
 //		    if (temp.contains("/")) {
 //				String[] temp_split = temp.split(" / ");
@@ -230,7 +261,7 @@ public class SentenceSplitter {
 //			}
 			
 			
-		}
+		
 		sentences_map.put(	KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + allType_text,	splitsentence);
 	}
 }
