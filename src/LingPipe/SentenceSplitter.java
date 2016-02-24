@@ -108,31 +108,128 @@ public class SentenceSplitter {
 		for (int i = 0; i < sentenceBoundaries.length; ++i) {
 		    String temp = "";
 			sentEndTok = sentenceBoundaries[i];
-		 //   System.out.println("SENTENCE "+(i+1)+": ");
 		    for (int j=sentStartTok; j <= sentEndTok; j++) {
 		    	temp += tokens[j]+whites[j+1];
 		    }
-		 //   System.out.println(temp);
 		    sentStartTok = sentEndTok+1;
 			
-			if (temp.contains("/")) {
-				String[] temp_split = temp.split(" / ");
-				for (String t : temp_split) {
-					if (!t.trim().toLowerCase().equals("null")) {
-						// remove phrase whose length is less than 3.
-						if (t.length() < 3) {
-							continue;
+		    
+			if (TypeofTarget.equals("phra")) {
+				if (temp.contains("/")) {
+					String[] temp_split = temp.split(" / ");
+					for (String t : temp_split) {
+						if (!t.trim().toLowerCase().equals("null")) {
+							// remove phrase whose length is less than 3.
+							if (t.length() < 3) {
+								continue;
+							}
+
+							String[] comma_split = t.split(",");
+							int comma_count = comma_split.length;
+
+							String subInput = "";
+
+							for (int j = 0; j < comma_count; j++) {
+								splitsentence.add(comma_split[j].toLowerCase().trim());
+							}
 						}
-						splitsentence.add(t.toLowerCase().trim());
+					}
+
+				} else {
+					// remove phrase whose length is less than 3.
+					if (temp.length() < 3) {
+						continue;
+					}
+					String[] comma_split = temp.split(",");
+					int comma_count = comma_split.length;
+
+					if (comma_count > 5) {
+						for (int j = 0; j < comma_count; j++) {
+
+							splitsentence.add(comma_split[j].toLowerCase().trim());
+						}
 					}
 				}
 			} else {
-				// remove phrase whose length is less than 3.
-				if (temp.length() < 3) {
-					continue;
-				}
 				splitsentence.add(temp.toLowerCase().trim());
 			}
+		    
+		    
+///////////////////////////////////////////////////////////////////////////////////		    
+//		    if (temp.contains("/")) {
+//				String[] temp_split = temp.split(" / ");
+//				for (String t : temp_split) {
+//					if (!t.trim().toLowerCase().equals("null")) {
+//						// remove phrase whose length is less than 3.
+//						if (t.length() < 3) {
+//							continue;
+//						}
+//						splitsentence.add(t.toLowerCase().trim());
+//					}
+//				}
+//			} else {
+//				// remove phrase whose length is less than 3.
+//				if (temp.length() < 3) {
+//					continue;
+//				}
+//				splitsentence.add(temp.toLowerCase().trim());
+//			}
+		    
+		    
+//////////////////////////////////////////////////////////		    
+		    
+		    
+		    
+//			if (temp.contains("/") && TypeofTarget.equals("phra")) {
+//				String[] temp_split = temp.split(" / ");
+//				for (String t : temp_split) {
+//					if (!t.trim().toLowerCase().equals("null")) {
+//						// remove phrase whose length is less than 3.
+//						if (t.length() < 3) {
+//							continue;
+//						}
+//						
+//						String[] comma_split = t.split(",");
+//						int comma_count = comma_split.length;
+//
+//						String subInput = "";
+//						if (comma_count > 5) {
+//							for (int j = 0; j < comma_count; j++) {
+//								int countDividedFive = j % 5;
+//								subInput = subInput + comma_split[j];
+//
+//								if (countDividedFive == 4 || j == comma_count - 1) {
+//									splitsentence.add(subInput.toLowerCase().trim());
+//									subInput = "";
+//								}
+//							}
+//						}
+//						
+//					}
+//				}
+//			} else {
+//				// remove phrase whose length is less than 3.
+//				if (temp.length() < 3) {
+//					continue;
+//				}
+//				String[] comma_split = temp.split(",");
+//				int comma_count = comma_split.length;
+//				
+//				String subInput = "";
+//				if (comma_count > 5) {
+//					for (int j = 0; j < comma_count; j++) {
+//						int countDividedFive = j % 5;
+//						subInput = subInput + comma_split[j];
+//
+//						if (countDividedFive == 4 || j == comma_count - 1) {
+//							splitsentence.add(subInput.toLowerCase().trim());
+//							subInput = "";
+//						}
+//					}
+//				}
+//			}
+			
+			
 		}
 		sentences_map.put(	KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + allType_text,	splitsentence);
 	}

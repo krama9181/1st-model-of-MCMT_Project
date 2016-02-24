@@ -21,11 +21,11 @@ public class Main_REModule {
 	 */
 	static String path = "D:/JUN/MCMT/End_of_project/";
 	
-	static String InputTextFile = path + "raw_inputData/changed_offset.txt"; // input text  \
+	static String InputTextFile = path + "raw_inputData/test_input.txt"; // input text  \
 	static String AnnFileFolder = path + "annotated/"; // Folder path whose annotation files will be stored.
 	static String UMLSDictionaryPath = path + "dictionary/UMLS_DICTIONARY_FOR_20_SEM.txt"; // UMLS dictionary path
 	static String TriggerDictionaryPath = path + "dictionary/Integrated_Triggers.txt"; // Trigger dictionary path
-	static String RelationResultOutputPath = path + "Output/changed_offset_output_6.tsv"; // Final output path
+	static String RelationResultOutputPath = path + "Output/bs_test_ouput2.tsv"; // Final output path
 	
 	public static void main(String[] args) throws Exception {
 		////////

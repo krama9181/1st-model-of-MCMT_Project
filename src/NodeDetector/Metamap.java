@@ -48,7 +48,7 @@ public class Metamap {
 						int start = start_end.getX();
 						int end = start + start_end.getY();
 						
-						String phenotype_name = getPhrase(utterance.getString(), start, end);
+						String phenotype_name = input.substring(start, end); //getPhrase(utterance.getString(), start, end);
 						String UMLS_ID = mapEv.getConceptId();
 						String UMLS_Symantic_type = mapEv.getSemanticTypes().get(0);
 						String tmp = phenotype_name + "\t" + start + "\t" + end + "\t" + UMLS_ID + "\t" + UMLS_Symantic_type;
