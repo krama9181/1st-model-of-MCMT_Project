@@ -38,22 +38,22 @@ public class NodeDetection {
 		 */
 
 		// Phenotype Dictionary load
-		MapDictionary<String> Phenotype_dictionary = new MapDictionary<String>();
-		File PDicfile = new File(UMLSDictionaryPath);
-		BufferedReader PDic_br = new BufferedReader(new FileReader(PDicfile));
-		String Pline = null;
-
-		System.out.println("Dictionary loading....");
-		while ((Pline = PDic_br.readLine()) != null) {
-			String[] contents = Pline.split("\t");
-			String CUI = contents[0];
-			String TUI = contents[1];
-			String STR = contents[2];
-
-			Phenotype_dictionary.addEntry(new DictionaryEntry<String>(STR, CUI + "\t" + TUI, CHUNK_SCORE));
-
-		}
-		System.out.println("Phenotype Dictionary is sucessfully loaded");
+//		MapDictionary<String> Phenotype_dictionary = new MapDictionary<String>();
+//		File PDicfile = new File(UMLSDictionaryPath);
+//		BufferedReader PDic_br = new BufferedReader(new FileReader(PDicfile));
+//		String Pline = null;
+//
+//		System.out.println("Dictionary loading....");
+//		while ((Pline = PDic_br.readLine()) != null) {
+//			String[] contents = Pline.split("\t");
+//			String CUI = contents[0];
+//			String TUI = contents[1];
+//			String STR = contents[2];
+//
+//			Phenotype_dictionary.addEntry(new DictionaryEntry<String>(STR, CUI + "\t" + TUI, CHUNK_SCORE));
+//
+//		}
+//		System.out.println("Phenotype Dictionary is sucessfully loaded");
 
 		// Trigger Dictionary load
 		MapDictionary<String> Trigger_dictionary = new MapDictionary<String>();
@@ -83,6 +83,7 @@ public class NodeDetection {
 			String[] contents = EntityOneline.split("\t");
 			String EntityOneName = contents[1];
 			String EntityOneRef_ID = contents[0];
+			
 			EntityOne_dictionary.addEntry(new DictionaryEntry<String>(EntityOneName, EntityOneRef_ID, CHUNK_SCORE));
 
 		}
@@ -95,8 +96,8 @@ public class NodeDetection {
 		System.out.println(
 				"--------------------------------------------------------------------------------------------------------------------------------");
 
-		ExactDictionaryChunker P_dictionaryChunkerTF = new ExactDictionaryChunker(Phenotype_dictionary,
-				IndoEuropeanTokenizerFactory.INSTANCE, true, false);
+//		ExactDictionaryChunker P_dictionaryChunkerTF = new ExactDictionaryChunker(Phenotype_dictionary,
+//				IndoEuropeanTokenizerFactory.INSTANCE, true, false);
 		ExactDictionaryChunker T_dictionaryChunkerTF = new ExactDictionaryChunker(Trigger_dictionary,
 				IndoEuropeanTokenizerFactory.INSTANCE, true, false);
 		ExactDictionaryChunker EntityOne_dictionaryChunkerTF = new ExactDictionaryChunker(EntityOne_dictionary,
@@ -106,15 +107,17 @@ public class NodeDetection {
 		LinkedHashSet<String> Pchunk_result = new LinkedHashSet<String>();
 		LinkedHashSet<String> Tchunk_result = new LinkedHashSet<String>();
 		LinkedHashSet<String> EntityOnechunk_result = new LinkedHashSet<String>();
-
+		
+		int processCounting = 0;
+		
 		for (Entry<String, LinkedHashSet<String>> entry : splitSentence_for_each_line.entrySet()) { // split sentences annotated phenotype.
 
 			String key = entry.getKey();
 			String[] key_split = key.split("\t");
 			String KindofText = key_split[0];
 			String dataType = key_split[1];
-			String EntityOneRef_ID = key_split[2].toLowerCase().trim();
-			String EntityOneName = key_split[3];
+			String EntityOneRef_ID = key_split[2];
+			String EntityOneName = key_split[3].toLowerCase();
 			String allType_text = key_split[4];
 						
 			StringBuffer makeReference = new StringBuffer();			
@@ -134,9 +137,18 @@ public class NodeDetection {
 			LinkedHashSet<String> value = new LinkedHashSet<String>();
 			value.clear();
 			value = entry.getValue();
-				
+			
 			String FileName = "";
-			FileName = RemoveMark(EntityOneName);
+			FileName = EntityOneRef_ID;
+			if(EntityOneRef_ID.length() > 100){
+				FileName = EntityOneRef_ID.substring(0, 95);
+			}
+			else{
+				FileName = EntityOneRef_ID;
+			}
+			
+			FileName = RemoveMark(FileName);
+			FileName = FileName.trim();
 			
 			File files = new File(AnnFileFolder + FileName + ".ann");
 			BufferedWriter out = new BufferedWriter(new FileWriter(files, true));
@@ -147,9 +159,20 @@ public class NodeDetection {
 
 			
 			for (String val : value) {
-				out.write("SplitSentence:" + val);
+				processCounting++;
+				
+				if (val.contains("co,ma")) {
+					val = val.substring(5);
+					out.write("SplitSentence:co,ma\t"+ val);
+					
+				}
+				else{
+					out.write("SplitSentence:"+ val);
+				}
+				
+				
 				out.newLine();
-
+				
 				/*
 				 *
 				 * Put in the code
@@ -175,12 +198,6 @@ public class NodeDetection {
 					out.write("Phenotype:" + p);
 					out.newLine();
 				}
-				
-				/*
-				 * 
-				 * **********************************************
-				 * 
-				 */
 
 				Tchunk_result.clear();
 				Tchunk_result = Tchunk(T_dictionaryChunkerTF, val.toLowerCase().trim(), "BROMFED-DM", "9");
@@ -188,18 +205,27 @@ public class NodeDetection {
 					out.write("Trigger:" + t);
 					out.newLine();
 				}
-				
 				EntityOnechunk_result.clear();
 				EntityOnechunk_result = EntityOnechunk(EntityOne_dictionaryChunkerTF, val.toLowerCase().trim(), "BROMFED-DM", "9");
-				for (String e : EntityOnechunk_result) {
-					out.write("EntityOne:" + e);
-					out.newLine();
+				
+				
+				
+				for (String o : EntityOnechunk_result) {
+					if(dataType.equals("sent")){
+						out.write("EntityOne:" + o);
+						out.newLine();
+					}
+					else{}
 				}
 					
 				// For delimiters in the ann file.
 				out.write("@@@");
 				out.newLine();
+				if(processCounting % 3000 == 0){
+					System.out.println("I just did " + processCounting);
+				}
 			}
+			
 			out.close();
 		}
 	}
@@ -294,7 +320,7 @@ public class NodeDetection {
 		return new_new_chunk_result;
 	}
 
-	static LinkedHashSet<String> Pchunk(ExactDictionaryChunker chunker, String text, String entityname, String entityID)
+	static LinkedHashSet<String> EntityOnechunk(ExactDictionaryChunker chunker, String text, String entityname, String entityID)
 			throws IOException {
 		LinkedHashSet<String> result = new LinkedHashSet<String>();
 		result.clear();
@@ -308,60 +334,6 @@ public class NodeDetection {
 			String phrase = text.substring(start, end);
 
 			// stop words
-			if (phrase.length() < 4) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("used")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("tuber")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("root")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("growth")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("other")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("null")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("indicated")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("induced")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("ease")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("arrest")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("symptom")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("distressed")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("painful")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("body")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("energy")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("syndrome")) {
-				continue;
-			}
-			if (phrase.toLowerCase().trim().equals("like")) {
-				continue;
-			}
 
 			result.add(phrase + "\t" + start + "\t" + end + "\t" + type);
 		}
@@ -405,47 +377,51 @@ public class NodeDetection {
 		return result_set;
 	}
 	
-	static LinkedHashSet<String> EntityOnechunk(ExactDictionaryChunker chunker, String text, String entityname, String entityID) throws IOException {
-		LinkedHashMap<String, String> result_map = new LinkedHashMap<String, String>();
-		LinkedHashSet<String> result_set = new LinkedHashSet<String>();
-		result_map.clear();
-		result_set.clear();
-
-		Chunking chunking = chunker.chunk(text);
-		for (Chunk chunk : chunking.chunkSet()) {
-			int start = chunk.start();
-			int end = chunk.end();
-			String type = chunk.type();
-			double score = chunk.score();
-			String phrase = text.substring(start, end);
-
-			// stop words
-			if (end + 3 <= text.length()) {
-				if (text.toLowerCase().trim().substring(start, end + 3).equals(phrase.toLowerCase().trim() + " by")) {
-					continue;
-				}
-			}
-			if (result_map.containsKey(phrase + "\t" + start + "\t" + end)) {
-				result_map.put(phrase + "\t" + start + "\t" + end, result_map.get(phrase + "\t" + start + "\t" + end) + "|" + type);
-			} else {
-				result_map.put(phrase + "\t" + start + "\t" + end, type);
-			}
-		}
-
-		for (Entry<String, String> entry : result_map.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
-
-			result_set.add(key + "\t" + value);
-		}
-		return result_set;
-	}
+//	static LinkedHashSet<String> EntityOnechunk(ExactDictionaryChunker chunker, String text, String entityname, String entityID) throws IOException {
+//		LinkedHashMap<String, String> result_map = new LinkedHashMap<String, String>();
+//		LinkedHashSet<String> result_set = new LinkedHashSet<String>();
+//		result_map.clear();
+//		result_set.clear();
+//
+//		Chunking chunking = chunker.chunk(text);
+//		for (Chunk chunk : chunking.chunkSet()) {
+//			int start = chunk.start();
+//			int end = chunk.end();
+//			String type = chunk.type();
+//			double score = chunk.score();
+//			String phrase = text.substring(start, end);
+//
+//			// stop words
+//			if (end + 3 <= text.length()) {
+//				if (text.toLowerCase().trim().substring(start, end + 3).equals(phrase.toLowerCase().trim() + " by")) {
+//					continue;
+//				}
+//			}
+//			if (result_map.containsKey(phrase + "\t" + start + "\t" + end)) {
+//				result_map.put(phrase + "\t" + start + "\t" + end, result_map.get(phrase + "\t" + start + "\t" + end) + "|" + type);
+//			} else {
+//				result_map.put(phrase + "\t" + start + "\t" + end, type);
+//			}
+//		}
+//
+//		for (Entry<String, String> entry : result_map.entrySet()) {
+//			String key = entry.getKey();
+//			String value = entry.getValue();
+//
+//			result_set.add(key + "\t" + value);
+//			
+//			System.out.println(key);
+//		}
+//		
+//		return result_set;
+//	}
 
 
 	static String RemoveMark (String text){
 		String clearText = "";
 		String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 		clearText =text.replaceAll(match, " ");
+		clearText = clearText.replaceAll("\\p{Z}","");
 		return clearText;
 	}
 		

@@ -93,15 +93,10 @@ public class ExtractRelation {
 				LinkedHashSet<String> annotatedEntityOne = new LinkedHashSet<String>();
 				String checkLine = "ID_";
 				int originalOffsetBase = 0;
+				boolean comma_checker = false;	
 				
-//				int originalEntityOne_start = 0;
-//				int originalEntityOne_end = 0;
-//				int originalTrigger_start = 0;
-//				int originalTrigger_end = 0;
-//				int originalPheno_start = 0;
-//				int originalPheno_end = 0;
-								
 				while ((line = br.readLine()) != null) {
+					
 					if (checkLine.equals(line.substring(0, 3))) {
 						String temp = line.substring(0 + "ID_OriginalText_Reference:".length(), line.length());
 						System.out.println(temp);
@@ -115,8 +110,6 @@ public class ExtractRelation {
 						continue;
 					}
 					
-					
-
 					String relationDefault = "";
 
 					if (KindofText.equals("fun")) {
@@ -131,6 +124,13 @@ public class ExtractRelation {
 
 					if (line.contains("SplitSentence:")) {
 						sentence = line.substring(0 + "SplitSentence:".length(), line.length());
+						
+						if(sentence.contains("co,ma")){
+							comma_checker = true;
+							String[] temp_sentence = sentence.split("\t");
+							sentence = temp_sentence[1];
+						}
+						
 					}
 					String phenotype = "";
 					if (line.contains("Phenotype:")) {
@@ -166,7 +166,7 @@ public class ExtractRelation {
 										Result.add("NA" + "\t" + "NA" + "\t" + relationDefault + "\t" + "NA" + "\t"
 												+ "NA" + "\t" + "NA" + "\t" + pheno[0] + "\t" + pheno[3] + "\t"
 												+ pheno[4] + "\t" + pheno[1] + "\t" + pheno[2] + "\t" + sentence  + "\t"  + "NA" + "\t"  + "NA" + "\t" + 
-												"NA" + "\t" + "NA"+ "\t"  + originalPheno_start + "\t" +( pheno[2]+originalOffsetBase));
+												"NA" + "\t" + "NA"+ "\t"  + originalPheno_start + "\t" +originalPheno_end);
 									}
 								} else {
 									for (String e : annotatedEntityOne) {
@@ -410,7 +410,7 @@ public class ExtractRelation {
 						}
 						for (String o : Result) {
 							out.write(EntityOneID.toUpperCase() + "\t" + EntityOneName + "\t" + EntityOneReference
-									+ "\t" + o + "\t" + originalSentence);
+									+ "\t" + o + "\t" + originalSentence + originalOffsetBase);
 							out.newLine();
 						}
 
@@ -419,7 +419,22 @@ public class ExtractRelation {
 						annotatedTrigger.clear();
 						annotatedEntityOne.clear();
 						
-						originalOffsetBase += sentence.length()+1;
+						if(dataType.equals("sent")){
+							originalOffsetBase += sentence.length()+1;
+						}
+						
+						else if (dataType.equals("phra")) {
+							if (comma_checker){
+								originalOffsetBase += sentence.length() + 2;
+								comma_checker = false;
+							}
+								
+							else
+								originalOffsetBase += sentence.length() + 3;
+							
+						}
+						
+						
 					}
 				}
 			}

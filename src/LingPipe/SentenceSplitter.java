@@ -11,6 +11,7 @@ import com.aliasi.util.Files;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -46,16 +47,26 @@ public class SentenceSplitter {
 
 		while ((textLine = br.readLine()) != null) {
 			System.out.println(textLine);
-
-			String[] textLine_split = textLine.split("\t");
-			String EntityOneRef_ID = textLine_split[whereIsEntityOneID];
-			String EntityOneName = textLine_split[whereIsEntityOneName];
-			String targetContents = textLine_split[whereIsTarget].trim();
 			
+//			String[] textLine_split = textLine.split("\t");
+//			String EntityOneRef_ID = textLine_split[whereIsEntityOneID];
+//			String EntityOneName = textLine_split[whereIsEntityOneName];
+//			String targetContents = textLine_split[whereIsTarget].trim();
+			
+			String[] textLine_split = textLine.split("\t");
+			String EntityOneRef_ID = "";
+			String EntityOneName = "";
+			String targetContents = "";
+
+			EntityOneRef_ID = textLine_split[whereIsEntityOneID];
+			EntityOneName = textLine_split[whereIsEntityOneName];
+			targetContents = textLine_split[whereIsTarget].trim();
+
 			if (targetContents.equals("null")) {
 			} else {
-				split_allTypeText(EntityOneRef_ID, EntityOneName, TypeofTarget , targetContents, whatKindTarget);
+				split_allTypeText(EntityOneRef_ID, EntityOneName, TypeofTarget, targetContents, whatKindTarget);
 			}
+
 		}
 		
 		return sentences_map;
@@ -87,13 +98,13 @@ public class SentenceSplitter {
 		whatKindTarget = in.next();
 	}
 
-	static void split_allTypeText(String EntityOneID, String EntityOneName, String dataType, String allType_text, String KindofText) {
+	static void split_allTypeText(String EntityOneID, String EntityOneName, String dataType, String targetContents, String KindofText) {
 
 		LinkedHashSet<String> splitsentence = new LinkedHashSet<String>();
 
 		List<String> tokenList = new ArrayList<String>();
 		List<String> whiteList = new ArrayList<String>();
-		Tokenizer tokenizer = TOKENIZER_FACTORY.tokenizer(allType_text.toCharArray(), 0, allType_text.length());
+		Tokenizer tokenizer = TOKENIZER_FACTORY.tokenizer(targetContents.toCharArray(), 0, targetContents.length());
 		tokenizer.tokenize(tokenList, whiteList);
 
 		String[] tokens = new String[tokenList.size()];
@@ -105,56 +116,97 @@ public class SentenceSplitter {
 		int sentStartTok = 0;
 		int sentEndTok = 0;
 		
-		for (int i = 0; i < sentenceBoundaries.length; ++i) {
-		    String temp = "";
-			sentEndTok = sentenceBoundaries[i];
-		    for (int j=sentStartTok; j <= sentEndTok; j++) {
-		    	temp += tokens[j]+whites[j+1];
-		    }
-		    sentStartTok = sentEndTok+1;
-			
-		    
-			if (TypeofTarget.equals("phra")) {
-				if (temp.contains("/")) {
-					String[] temp_split = temp.split(" / ");
-					for (String t : temp_split) {
-						if (!t.trim().toLowerCase().equals("null")) {
-							// remove phrase whose length is less than 3.
-							if (t.length() < 3) {
-								continue;
-							}
+		
+		
+		if(dataType.equals("sent")){
+			for (int i = 0; i < sentenceBoundaries.length; ++i) {
+			    String temp = "";
+				sentEndTok = sentenceBoundaries[i];
+			    for (int j=sentStartTok; j <= sentEndTok; j++) {
+			    	temp += tokens[j]+whites[j+1];
+			    }
+			    sentStartTok = sentEndTok+1;
 
-							String[] comma_split = t.split(",");
-							int comma_count = comma_split.length;
+			splitsentence.add(temp.toLowerCase().trim());
+			}
+		}
+		
+		else if (dataType.equals("phra")) {
+			if (targetContents.contains("/")) {
+				String[] temp_split = targetContents.split(" / ");
+				for (String t : temp_split) {
+					if (!t.trim().toLowerCase().equals("null") && t.contains(", ")) {
+						String[] comma_split = t.split(",");
 
-							String subInput = "";
-
-							for (int j = 0; j < comma_count; j++) {
-								splitsentence.add(comma_split[j].toLowerCase().trim());
-							}
+						for (int k = 0; k < comma_split.length-1; k++) {
+							splitsentence.add("co,ma" + comma_split[k].trim().toLowerCase());
 						}
-					}
+						splitsentence.add(comma_split[comma_split.length-1].trim().toLowerCase());
 
-				} else {
-					// remove phrase whose length is less than 3.
-					if (temp.length() < 3) {
-						continue;
-					}
-					String[] comma_split = temp.split(",");
-					int comma_count = comma_split.length;
-
-					if (comma_count > 5) {
-						for (int j = 0; j < comma_count; j++) {
-
-							splitsentence.add(comma_split[j].toLowerCase().trim());
-						}
+					} else {
+						splitsentence.add(t.trim().toLowerCase());
 					}
 				}
 			} else {
-				splitsentence.add(temp.toLowerCase().trim());
+				if(targetContents.contains(", ")){
+					String[] comma_split = targetContents.split(", ");
+					for (int k = 0; k < comma_split.length-1; k++) {
+						splitsentence.add("co,ma" + comma_split[k].trim().toLowerCase());
+					}
+					splitsentence.add(comma_split[comma_split.length-1].trim().toLowerCase());
+				}
+				else{
+					splitsentence.add(targetContents.trim().toLowerCase());
+				}
 			}
+		
+		}
+		
+		else{
+		    System.out.println("You entered odd value of type of sentence");
+		}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//			if (TypeofTarget.equals("phra")) {
+//				if (temp.contains("/")) {
+//					String[] temp_split = temp.split(" / ");
+//					for (String t : temp_split) {
+//						if (!t.trim().toLowerCase().equals("null")) {
+//							// remove phrase whose length is less than 3.
+//							if (t.length() < 3) {
+//								continue;
+//							}
+//
+//							String[] comma_split = t.split(",");
+//							int comma_count = comma_split.length;
+//
+//							String subInput = "";
+//
+//							for (int j = 0; j < comma_count; j++) {
+//								splitsentence.add(comma_split[j].toLowerCase().trim());
+//							}
+//						}
+//					}
+//
+//				} else {
+//					// remove phrase whose length is less than 3.
+//					if (temp.length() < 3) {
+//						continue;
+//					}
+//					String[] comma_split = temp.split(",");
+//					int comma_count = comma_split.length;
+//
+//					if (comma_count > 5) {
+//						for (int j = 0; j < comma_count; j++) {
+//
+//							splitsentence.add(comma_split[j].toLowerCase().trim());
+//						}
+//					}
+//				}
+//			} else {
+//				splitsentence.add(temp.toLowerCase().trim());
+//			}
 		    
-		    
+		
 ///////////////////////////////////////////////////////////////////////////////////		    
 //		    if (temp.contains("/")) {
 //				String[] temp_split = temp.split(" / ");
@@ -230,7 +282,6 @@ public class SentenceSplitter {
 //			}
 			
 			
-		}
-		sentences_map.put(	KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + allType_text,	splitsentence);
+		sentences_map.put(	KindofText + "\t" + dataType + "\t" + EntityOneID + "\t" + EntityOneName + "\t" + targetContents,	splitsentence);
 	}
 }

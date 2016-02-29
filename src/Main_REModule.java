@@ -21,11 +21,11 @@ public class Main_REModule {
 	 */
 	static String path = "D:/JUN/MCMT/End_of_project/";
 	
-	static String InputTextFile = path + "raw_inputData/test_input.txt"; // input text  \
+	static String InputTextFile = "D:/JUN/MCMT/preprocessing/packaging_output/after_pp_deal_pronoun/pp_DCDB_compo_200_6.txt"; // input text  
 	static String AnnFileFolder = path + "annotated/"; // Folder path whose annotation files will be stored.
 	static String UMLSDictionaryPath = path + "dictionary/UMLS_DICTIONARY_FOR_20_SEM.txt"; // UMLS dictionary path
 	static String TriggerDictionaryPath = path + "dictionary/Integrated_Triggers.txt"; // Trigger dictionary path
-	static String RelationResultOutputPath = path + "Output/bs_test_ouput2.tsv"; // Final output path
+	static String RelationResultOutputPath = path + "Output/preprocessing_test/after_pp.txt"; // Final output path
 	
 	public static void main(String[] args) throws Exception {
 		////////
@@ -67,10 +67,33 @@ public class Main_REModule {
 	
 	public static void createFolder() {
 		File annotationFolder = new File(AnnFileFolder);
-		if (!annotationFolder.exists())
+		if (!annotationFolder.exists()){
 			annotationFolder.mkdir();
-		else
-			System.out.println("Already exists!");
-		
+		}
+		else{
+			removeDIR(AnnFileFolder);
+			annotationFolder.mkdir();
+		}
 	}
+	
+	public static void removeDIR(String source){
+		File[] listFile = new File(source).listFiles(); 
+		try{
+			if(listFile.length > 0){
+				for(int i = 0 ; i < listFile.length ; i++){
+					if(listFile[i].isFile()){
+						listFile[i].delete(); 
+					}else{
+						removeDIR(listFile[i].getPath());
+					}
+					listFile[i].delete();
+				}
+			}
+		}catch(Exception e){
+			System.err.println(System.err);
+			System.exit(-1); 
+		}
+			
+	}
+	
 }
