@@ -165,6 +165,7 @@ public class SentenceSplitter {
 		else{
 		    System.out.println("You entered odd value of type of sentence");
 		}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //			if (TypeofTarget.equals("phra")) {
 //				if (temp.contains("/")) {
