@@ -25,7 +25,7 @@ public class NodeDetection {
 	static final double CHUNK_SCORE = 1.0;
 
 	public void NodeDectector(LinkedHashMap<String, LinkedHashSet<String>> splitSentence_for_each_line,
-			String UMLSDictionaryPath, String TriggerDictionaryPath, String EntityOneDictionaryPath, String AnnFileFolder) throws Exception {
+			String TriggerDictionaryPath, String EntityOneDictionaryPath, String AnnFileFolder) throws Exception {
 
 		Metamap mm = new Metamap();
 		MetaMapApi api = new MetaMapApiImpl();

@@ -99,7 +99,7 @@ public class ExtractRelation {
 					
 					if (checkLine.equals(line.substring(0, 3))) {
 						String temp = line.substring(0 + "ID_OriginalText_Reference:".length(), line.length());
-						System.out.println(temp);
+						//System.out.println(temp);
 						String[] temp_split = temp.split("\t");
 						KindofText = temp_split[0];
 						dataType = temp_split[1];
@@ -149,59 +149,68 @@ public class ExtractRelation {
 					}
 					if (line.equals("@@@")) {
 						if (annotatedEntityOne.size() >= 0 && annotatedTrigger.size() >= 0	&& annotatedPhenotype.size() > 0) {
-
 							////// no relation /////
+							
 							if (annotatedTrigger.size() == 0) {
-								if (annotatedEntityOne.size() == 0) {
-									for (String p : annotatedPhenotype) {
-										String[] pheno = p.split("\t");
-										
-										int originalEntityOne_start = 0;
-										int originalEntityOne_end = 0;
-										int originalTrigger_start = 0;
-										int originalTrigger_end = 0;
-										int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
-										int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
-										
-										Result.add("NA" + "\t" + "NA" + "\t" + relationDefault + "\t" + "NA" + "\t"
-												+ "NA" + "\t" + "NA" + "\t" + pheno[0] + "\t" + pheno[3] + "\t"
-												+ pheno[4] + "\t" + pheno[1] + "\t" + pheno[2] + "\t" + sentence  + "\t"  + "NA" + "\t"  + "NA" + "\t" + 
-												"NA" + "\t" + "NA"+ "\t"  + originalPheno_start + "\t" +originalPheno_end);
-									}
-								} else {
-									for (String e : annotatedEntityOne) {
-										String[] entiOne = e.split("\t");
-										int e_begin = Integer.valueOf(entiOne[1]);
-										int e_end = Integer.valueOf(entiOne[2]);
-
+								if (dataType.equals("term")) {
+									if (annotatedEntityOne.size() == 0) {
 										for (String p : annotatedPhenotype) {
 											String[] pheno = p.split("\t");
-											int p_begin = Integer.valueOf(pheno[1]);
-											int p_end = Integer.valueOf(pheno[2]);
-											int p_begin_minus_e_begin = p_begin - e_begin;
 
-											if (p_begin_minus_e_begin > 0) {
-												
-												int originalEntityOne_start = Integer.parseInt(entiOne[1])+originalOffsetBase;
-												int originalEntityOne_end = Integer.parseInt(entiOne[2])+originalOffsetBase;
-												int originalTrigger_start = 0;
-												int originalTrigger_end = 0;
-												int originalPheno_start = Integer.parseInt(pheno[1])+originalOffsetBase;
-												int originalPheno_end = Integer.parseInt(pheno[2])+originalOffsetBase;
-												
-												Result.add(entiOne[1] + "\t" + entiOne[2] + "\t" + relationDefault
-														+ "\t" + "NA" + "\t" + "NA" + "\t" + "NA" + "\t" + pheno[0]
-														+ "\t" + pheno[3] + "\t" + pheno[4] + "\t" + pheno[1] + "\t"
-														+ pheno[2] + "\t" + sentence + "\t" + originalEntityOne_start + "\t" 
-														+ originalEntityOne_end + "\t" + "NA" + "\t" + "NA" + "\t" + 
-														originalPheno_start + "\t" +originalPheno_end);
-											}
+											int originalEntityOne_start = 0;
+											int originalEntityOne_end = 0;
+											int originalTrigger_start = 0;
+											int originalTrigger_end = 0;
+											int originalPheno_start = Integer.parseInt(pheno[1]) + originalOffsetBase;
+											int originalPheno_end = Integer.parseInt(pheno[2]) + originalOffsetBase;
+
+											Result.add("NA" + "\t" + "NA" + "\t" + relationDefault + "\t" + "NA" + "\t"
+													+ "NA" + "\t" + "NA" + "\t" + pheno[0] + "\t" + pheno[3] + "\t"
+													+ pheno[4] + "\t" + pheno[1] + "\t" + pheno[2] + "\t" + sentence
+													+ "\t" + "NA" + "\t" + "NA" + "\t" + "NA" + "\t" + "NA" + "\t"
+													+ originalPheno_start + "\t" + originalPheno_end);
 										}
+									} else {
+										for (String e : annotatedEntityOne) {
+											String[] entiOne = e.split("\t");
+											int e_begin = Integer.valueOf(entiOne[1]);
+											int e_end = Integer.valueOf(entiOne[2]);
 
+											for (String p : annotatedPhenotype) {
+												String[] pheno = p.split("\t");
+												int p_begin = Integer.valueOf(pheno[1]);
+												int p_end = Integer.valueOf(pheno[2]);
+												int p_begin_minus_e_begin = p_begin - e_begin;
+
+												if (p_begin_minus_e_begin > 0) {
+
+													int originalEntityOne_start = Integer.parseInt(entiOne[1])
+															+ originalOffsetBase;
+													int originalEntityOne_end = Integer.parseInt(entiOne[2])
+															+ originalOffsetBase;
+													int originalTrigger_start = 0;
+													int originalTrigger_end = 0;
+													int originalPheno_start = Integer.parseInt(pheno[1])
+															+ originalOffsetBase;
+													int originalPheno_end = Integer.parseInt(pheno[2])
+															+ originalOffsetBase;
+
+													Result.add(entiOne[1] + "\t" + entiOne[2] + "\t" + relationDefault
+															+ "\t" + "NA" + "\t" + "NA" + "\t" + "NA" + "\t" + pheno[0]
+															+ "\t" + pheno[3] + "\t" + pheno[4] + "\t" + pheno[1] + "\t"
+															+ pheno[2] + "\t" + sentence + "\t"
+															+ originalEntityOne_start + "\t" + originalEntityOne_end
+															+ "\t" + "NA" + "\t" + "NA" + "\t" + originalPheno_start
+															+ "\t" + originalPheno_end);
+												}
+											}
+
+										}
 									}
 								}
+								else{}
 							}
-
+							
 							// ### when only one trigger's detected.
 							else if (annotatedTrigger.size() == 1) {
 								if (annotatedEntityOne.size() == 0) {
@@ -408,9 +417,11 @@ public class ExtractRelation {
 								}
 							}
 						}
+						
+						
 						for (String o : Result) {
 							out.write(EntityOneID.toUpperCase() + "\t" + EntityOneName + "\t" + EntityOneReference
-									+ "\t" + o + "\t" + originalSentence + originalOffsetBase);
+									+ "\t" + o + "\t" + originalSentence);
 							out.newLine();
 						}
 

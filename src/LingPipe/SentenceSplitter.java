@@ -45,6 +45,9 @@ public class SentenceSplitter {
 		BufferedReader br = new BufferedReader(new FileReader(FunctionTextFile));
 		String textLine = null;
 
+		int except_error = 0;
+		int db_length = 0;
+		
 		while ((textLine = br.readLine()) != null) {
 			System.out.println(textLine);
 			
@@ -54,6 +57,13 @@ public class SentenceSplitter {
 //			String targetContents = textLine_split[whereIsTarget].trim();
 			
 			String[] textLine_split = textLine.split("\t");
+			
+			if(except_error == 0){
+				db_length = textLine_split.length;
+				except_error++;
+			}
+				
+				
 			String EntityOneRef_ID = "";
 			String EntityOneName = "";
 			String targetContents = "";
@@ -61,12 +71,15 @@ public class SentenceSplitter {
 			EntityOneRef_ID = textLine_split[whereIsEntityOneID];
 			EntityOneName = textLine_split[whereIsEntityOneName];
 			targetContents = textLine_split[whereIsTarget].trim();
-
-			if (targetContents.equals("null")) {
+			
+			if (textLine_split.length == db_length) {
+				if (targetContents.equals("null")) {
+				} else {
+					split_allTypeText(EntityOneRef_ID, EntityOneName, TypeofTarget, targetContents, whatKindTarget);
+				}
 			} else {
-				split_allTypeText(EntityOneRef_ID, EntityOneName, TypeofTarget, targetContents, whatKindTarget);
+				System.out.println("열이 안맞는 데이터잖여");
 			}
-
 		}
 		
 		return sentences_map;

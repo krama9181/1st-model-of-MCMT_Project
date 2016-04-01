@@ -14,19 +14,24 @@ public class Main_REModule {
 	
 	///Remodel change////
 	
-	/*
+	/*S
 	 * 
 	 * File Path Declaration ( You should change the path )
 	 * 
 	 */
-	static String path = "D:/JUN/MCMT/End_of_project/";
+	static String path = "C:/Users/admin/Desktop/workspace/";
 	
-	static String InputTextFile = "D:/JUN/MCMT/preprocessing/packaging_output/after_pp_deal_pronoun/pp_DCDB_compo_200_6.txt"; // input text  
+	static String InputTextFile = path + "input/sentence_data_1.txt";
+	//static String InputTextFile = path + "raw_inputData/TCMID_herb.txt"; // input text  
 	static String AnnFileFolder = path + "annotated/"; // Folder path whose annotation files will be stored.
-	static String UMLSDictionaryPath = path + "dictionary/UMLS_DICTIONARY_FOR_20_SEM.txt"; // UMLS dictionary path
-	static String TriggerDictionaryPath = path + "dictionary/Integrated_Triggers.txt"; // Trigger dictionary path
-	static String RelationResultOutputPath = path + "Output/preprocessing_test/after_pp.txt"; // Final output path
+	//static String TriggerDictionaryPath = path + "dictionary/Integrated_Triggers.txt"; // Trigger dictionary path
 	
+	static String TriggerDictionaryPath = path + "dictionary/Revised_dictionary.txt";	// Revised dictionary path
+	
+	
+	static String RelationResultOutputPath = path + "Output/sentenceData_output_1.tsv"; // Final output path
+	
+	//static String UMLSDictionaryPath = path + "dictionary/UMLS_DICTIONARY_FOR_20_SEM.txt"; // UMLS dictionary path
 	public static void main(String[] args) throws Exception {
 		////////
 		createFolder();			
@@ -54,7 +59,7 @@ public class Main_REModule {
 		 * Phenotype Detector, Trigger Detector
 		 * 
 		 */
-		node_detector.NodeDectector(splitSentence_for_each_line, UMLSDictionaryPath, TriggerDictionaryPath,	InputTextFile, AnnFileFolder);
+		node_detector.NodeDectector(splitSentence_for_each_line, TriggerDictionaryPath,	InputTextFile, AnnFileFolder);
 		/*
 		 * 
 		 * //Relation Extraction
